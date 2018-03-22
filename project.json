@@ -1,0 +1,11 @@
+{
+  "name": "craftdock/apk-builder",
+  "default": "latest",
+  "versions": [
+    {
+      "version": "latest",
+      "dockerfile": "Dockerfile",
+      "context": "."
+    }
+  ]
+}
