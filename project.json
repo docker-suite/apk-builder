@@ -4,8 +4,18 @@
   "versions": [
     {
       "version": "latest",
-      "dockerfile": "Dockerfile",
-      "context": "."
+      "dockerfile": "3.7/Dockerfile",
+      "context": "3.7/."
+    },
+    {
+      "version": "edge",
+      "dockerfile": "edge/Dockerfile",
+      "context": "edge/."
+    },
+    {
+      "version": "3.7",
+      "dockerfile": "3.7/Dockerfile",
+      "context": "3.7/."
     }
   ]
 }
