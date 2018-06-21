@@ -6,7 +6,7 @@ ENV PACKAGER "Hexosse <hexosse@gmail.com>"
 COPY /package /package
 
 RUN set -x \
-    # Build Hugo apk file
+    # Build apk file
     && /entrypoint abuild -r \
     # Copy the package where root can access it
     && sudo cp /packages/x86_64/hugo-0.37.1-r0.apk /tmp
