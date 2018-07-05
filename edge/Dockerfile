@@ -35,6 +35,7 @@ RUN \
 
 # Copy entrypoint script
 COPY /entrypoint /
+RUN chmod +x /entrypoint
 
 # Entrypoint
 ENTRYPOINT ["/entrypoint"]
