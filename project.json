@@ -16,6 +16,11 @@
       "version": "3.7",
       "dockerfile": "3.7/Dockerfile",
       "context": "3.7/."
+    },
+    {
+      "version": "3.8",
+      "dockerfile": "3.8/Dockerfile",
+      "context": "3.8/."
     }
   ]
 }
