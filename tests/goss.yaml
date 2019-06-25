@@ -1,0 +1,32 @@
+package:
+  alpine-sdk:
+    installed: true
+  cmake:
+    installed: true
+  coreutils:
+    installed: true
+  curl:
+    installed: true
+  sudo:
+    installed: true
+
+file:
+  /entrypoint.sh:
+    exists: true
+    mode: "0777"
+    filetype: file
+
+group:
+  abuild:
+    exists: true
+    gid: 300
+    skip: false
+
+user:
+  builder:
+    exists: true
+    uid: 1000
+    gid: 300
+    groups:
+    - abuild
+    skip: false

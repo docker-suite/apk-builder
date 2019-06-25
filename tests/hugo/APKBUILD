@@ -1,5 +1,5 @@
 pkgname=hugo
-pkgver=0.37.1
+pkgver=0.55.6
 pkgrel=0
 pkgdesc="A Fast and Flexible Static Site Generator built with love in GoLang"
 url="http://gohugo.io/"
@@ -19,4 +19,4 @@ package() {
     return 0
 }
 
-sha512sums="069de7e4ec9d38097e2e17825df370822cb6d001b6023d187110e765b0f8c738d822038261aa85ff072f007cd0f93b5fa5b39578363cef1d474bc7f3336da708  hugo-0.37.1.tar.gz"
+sha512sums="5fd7c45631e7c395fb430bcc029999ef46303a13141c35a8fc84d85a05fc8586c4d45837f7b2c321ceef269bc0e5bbe567f93f301dc5eb13645e6516cf983914  hugo-0.55.6.tar.gz"
