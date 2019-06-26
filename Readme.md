@@ -1,4 +1,10 @@
 # ![](https://github.com/docker-suite/artwork/raw/master/logo/png/logo_32.png) apk-builder
+[![Build Status](http://jenkins.hexocube.fr/job/docker-suite/job/apk-builder/badge/icon?color=green&style=flat-square)](http://jenkins.hexocube.fr/job/docker-suite/job/apk-builder/)
+![Docker Pulls](https://img.shields.io/docker/pulls/dsuite/apk-builder.svg?style=flat-square)
+![Docker Stars](https://img.shields.io/docker/stars/dsuite/apk-builder.svg?style=flat-square)
+![MicroBadger Layers (tag)](https://img.shields.io/microbadger/layers/dsuite/apk-builder/latest.svg?style=flat-square)
+![MicroBadger Size (tag)](https://img.shields.io/microbadger/image-size/dsuite/apk-builder/latest.svg?style=flat-square)
+[![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 
 Build your own package for [Alpine][alpine].
 
