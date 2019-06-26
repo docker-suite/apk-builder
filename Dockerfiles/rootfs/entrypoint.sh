@@ -81,6 +81,9 @@ else
     # Sign index if exist
     [ -f "/packages/$ALPINE_VERSION/x86_64/APKINDEX.tar.gz" ] && abuild-sign -k $PACKAGER_PRIVKEY -p $RSA_KEY_NAME "/packages/$ALPINE_VERSION/x86_64/APKINDEX.tar.gz"
 
+    # Make keys belong to user builder
+    sudo chown -R builder:abuild /package/config
+
     # APKBUILD must exist in /package
     if [ ! -s "/package/APKBUILD" ]; then
         echo "APKBUILD must exist in /package"
