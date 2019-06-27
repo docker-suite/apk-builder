@@ -46,7 +46,7 @@ The resulting apk file and signed index can be found in  `packages` folder
 ```bash
     docker run \
         -v $PWD/package:/package \
-        -v $PWD/packages/:/packages \
+        -v $PWD/packages:/packages \
         dsuite/apk-builder:3.9
 ```
 
@@ -60,7 +60,7 @@ Or with an existing RSA key
         -e PACKAGER_PRIVKEY="$PWD/package/config/my-key.rsa.pub" \
         -e PACKAGER_PUBKEY="$PWD/package/config/my-key.rsa.priv" \
         -v $PWD/package:/package \
-        -v $PWD/packages/:/packages \
+        -v $PWD/packages:/packages \
         dsuite/apk-builder:3.9
 ```
 
