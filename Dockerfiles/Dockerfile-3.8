@@ -49,7 +49,11 @@ RUN \
 
 ## Copy entrypoint script and make it executable
 COPY --chown=builder:abuild /rootfs /
-RUN chmod +x /entrypoint.sh
+RUN \
+	set -x \
+    && chmod +x /usr/local/bin/generate-index.sh \
+    && chmod +x /usr/local/bin/generate.sh \
+    && chmod +x /entrypoint.sh
 
 
 ## Set default user to builder
