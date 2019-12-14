@@ -1,18 +1,18 @@
 # Hugo apk Builder
-FROM dsuite/apk-builder:3.9 as hugo_apk_builder
+FROM dsuite/apk-builder:3.10 as hugo_apk_builder
 
 ENV RSA_KEY_NAME hugo.rsa
 
-COPY /package /package
+COPY /packages /packages
 
 RUN set -x \
     # Build apk file
-    && /entrypoint.sh \
+    && USER=packager /entrypoint.sh package \
     # Copy the package where root can access it
-    && sudo cp -r /packages /repo
+    && cp -r /public /repo
 
 # Hugo image
-FROM dsuite/alpine-base:3.9
+FROM dsuite/alpine-base:3.10
 
 COPY --from=hugo_apk_builder /repo /tmp/repo
 COPY --from=hugo_apk_builder /etc/apk/keys /etc/apk/keys
@@ -23,7 +23,7 @@ RUN \
     # Update repository indexes
     && apk update \
     # Download the install script and run it
-    && apk add --repository /tmp/repo/v3.9 \
+    && apk add --repository /tmp/repo/v3.10 \
         hugo \
 	# Clear apk's cache
 	&& apk-cleanup

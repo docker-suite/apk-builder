@@ -1,18 +1,8 @@
 
-/.example/hugo-alpine/*/config
-/.example/hugo-alpine/*/pkg
-/.example/hugo-alpine/*/src
-/.example/hugo-alpine/packages
+**/config
+**/packages
+**/public
 
-/.example/hugo-apk/*/config
-/.example/hugo-apk/*/pkg
-/.example/hugo-apk/*/src
-/.example/hugo-apk/packages
-
-/Dockerfiles/rootfs/home/builder/.abuild/docker-suite.rsa.priv
-
-/packages
-
-/tests/*/config
-/tests/*/pkg
-/tests/*/src
+**/Dockerfile-*
+**/*.rsa.priv
+**/*.rsa.pub

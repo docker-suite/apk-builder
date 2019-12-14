@@ -13,7 +13,7 @@ package:
 file:
   /entrypoint.sh:
     exists: true
-    mode: "0777"
+    mode: "0755"
     filetype: file
 
 group:
@@ -23,9 +23,9 @@ group:
     skip: false
 
 user:
-  builder:
+  packager:
     exists: true
-    uid: 1000
+    uid: 100
     gid: 300
     groups:
     - abuild

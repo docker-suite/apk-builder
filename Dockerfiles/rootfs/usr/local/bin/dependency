@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+
+# shellcheck disable=SC1091
+source /usr/local/lib/bash-logger.sh && LOG_RESET
+
+# set -e : Exit the script if any statement returns a non-true return value.
+# set -u : Exit the script when using uninitialised variable.
+set -eu
+
+# ------------------------------------------------------------------------------
+#
+#   Add package dependency
+#
+# ------------------------------------------------------------------------------
+
+# Help
+if [ $# -eq 0 ]; then
+    usage
+fi
+
+declare packages
+declare dependencies
+declare action=add
+
+# Check for a list of packages to build
+while [ $# -gt 0 ]; do
+  if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+    usage
+  fi
+
+  if [ "$1" = "add" ]; then
+    action="add"
+  fi
+
+  if [ "$1" = "remove" ]; then
+    action="remove"
+  fi
+
+  if [ "$1" = "-p" ] || [ "$1" = "--packages" ]; then
+    DEBUG "Selected package '${2}'"
+    packages="${2#\/packages\/}"
+  fi
+
+  if [ "$1" = "-d" ] || [ "$1" = "--dependency" ]; then
+    DEBUG "Selected dependency '${2}'"
+    dependencies="${2#\/packages\/}"
+  fi
+
+  shift
+done
+
+usage() {
+    echo "Dependecy helper"
+    echo ""
+    echo "Script for adding/removing package dependenceis"
+    echo ""
+    echo "SYNOPSIS:"
+    echo "  dependency add [<options>]"
+    echo "  dependency remove [<options>]"
+    echo ""
+    echo "OPTIONS:"
+    echo "  -h, --help          Display this help."
+    echo "  -p, --packages      'package_name...'"
+    echo "  -d, --dependencies  'package_name...'"
+    exit 0;
+}
+
+# Check if package exis
+for package in $packages; do
+    if [ ! -d "/packages/$package" ]; then
+        WARNING "Unable to find package '$package'"
+        exit 2
+    fi
+done
+
+# Check if dependency exis
+for dependency in $dependencies; do
+    if [ ! -d "/packages/$dependency" ]; then
+        WARNING "Unable to find dependency '$dependency'"
+        exit 2
+    fi
+done
+
+# Add dependencies to packages
+
+for package in $packages; do
+    for dependency in $dependencies; do
+        # Add
+        if [ $action = "add" ];then
+            DEBUG "Adding '$dependency' as a dependency of '$package'"
+            rm -rf "/packages/$package/$dependency"
+            ln -s "/packages/$dependency/" "/packages/$package/$dependency"
+        fi
+        # Remove
+        if [ $action = "remove" ];then
+            DEBUG "Removing '$dependency' as a dependency of '$package'"
+            rm -rf "/packages/$package/$dependency"
+        fi
+    done
+done

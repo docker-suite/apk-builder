@@ -1,0 +1,62 @@
+FROM dsuite/alpine-base:{{ALPINE_VERSION}}
+
+LABEL maintainer="Hexosse <hexosse@gmail.com>" \
+      description="Alpine package builder." \
+      vendor="docker-suite" \
+      license="MIT"
+
+## Packager infos
+ENV PACKAGER "Hexosse <hexosse@gmail.com>"
+ENV MAINTAINER $PACKAGER
+
+# Alpine infos
+ENV ALPINE_VERSION={{ALPINE_VERSION}}
+
+## Tell git not to stop at filesystem boundaries.
+ENV GIT_DISCOVERY_ACROSS_FILESYSTEM=1
+
+# Keys used to sign the packages
+# To use your own keys, place it in /package/config folder
+# and declare RSA_KEY_NAME
+ENV RSA_KEY_NAME docker-suite.rsa
+ENV PACKAGER_PRIVKEY /config/$RSA_KEY_NAME.priv
+ENV PACKAGER_PUBKEY /config/$RSA_KEY_NAME.pub
+
+## User who will build all packages
+ENV USER packager
+
+## Create packager user and make it member of group abuild
+RUN \
+	# Print executed commands
+	set -x \
+    # Create packager user member of group abuild
+    && adduser -S -D -G abuild -g "Alpine Package Builder" -s /bin/bash "packager" \
+    # Make our packager user like sudo
+    && echo "packager ALL=(ALL) ALL" >> /etc/sudoers \
+    && echo "packager ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+
+
+## Install latest version of alpine-sdk
+## and commmons tools taht can be used
+## in building process
+RUN \
+	# Print executed commands
+	set -x \
+    # Update repository indexes
+    && apk-update \
+    # Install latest versions of packages included in alpine-sdk
+    && apk-install \
+        # alpine-sdk
+        alpine-sdk \
+        # common tools
+        cmake coreutils \
+	# Clear apk's cache
+	&& apk-cleanup
+
+
+## Copy scripts
+COPY --chown=packager:abuild /rootfs /
+
+## Define the default working folder
+WORKDIR /packages

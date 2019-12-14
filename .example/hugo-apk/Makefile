@@ -1,17 +1,26 @@
+## Current directory
 DIR:=$(strip $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST)))))
 
-build:
+##
+.DEFAULT_GOAL := package
+.PHONY: *
+
+package:
+	@mkdir -p $(DIR)/config
 	@mkdir -p $(DIR)/packages
+	@mkdir -p $(DIR)/public
 	@docker run -it --rm \
 		-e http_proxy=${http_proxy} \
 		-e https_proxy=${https_proxy} \
 		-e RSA_KEY_NAME=hugo.rsa \
-		-v $(DIR)/package:/package \
+		-v $(DIR)/config:/config \
 		-v $(DIR)/packages:/packages \
-		dsuite/apk-builder:3.9
+		-v $(DIR)/public:/public \
+		dsuite/apk-builder:3.10 \
+		bash -c "package"
 
 clean:
-	@rm -rf $(DIR)/packages
-	@rm -rf $(DIR)/package/config
-	@rm -rf $(DIR)/package/pkg
-	@rm -rf $(DIR)/package/src
+	@rm -rf $(DIR)/config
+	@rm -rf $(DIR)/packages/**/pkg
+	@rm -rf $(DIR)/packages/**/src
+	@rm -rf $(DIR)/public

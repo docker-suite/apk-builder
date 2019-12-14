@@ -5,6 +5,7 @@
 ![MicroBadger Layers (tag)](https://img.shields.io/microbadger/layers/dsuite/apk-builder/latest.svg?style=flat-square)
 ![MicroBadger Size (tag)](https://img.shields.io/microbadger/image-size/dsuite/apk-builder/latest.svg?style=flat-square)
 [![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+[![dockeri.co](https://dockeri.co/image/dsuite/apk-builder)](https://hub.docker.com/r/dsuite/apk-builder)
 
 Build your own package for [Alpine][alpine].
 
@@ -20,34 +21,33 @@ More infos on [Alpine][alpine] packages :
 
 ## ![](https://github.com/docker-suite/artwork/raw/master/various/pin/png/pin_16.png) RSA keys
 
-apk-builder embed a default public and private key used to signed the package index file.  
-However you can choose to generate a new key pair or to use your own key
-
 ### Create a new key pair
 
-* Declare `RSA_KEY_NAME` environment variable with a name to give to your key and a new key pair will be generated in `/package/config` folder. 
+Declare `RSA_KEY_NAME` environment variable with a name to give to your key and a new key pair will be generated in `/config` folder. 
 
 ### Use your own key
 
-To use your own key, place your public and private key in `/package/config` folder.  
+To use your own key, place your public and private key in `/config` folder.  
 Then declare the following environment variable:
 * `RSA_KEY_NAME`: This is the name given to your key (Exemple: `my-key.rsa`)  
-* `PACKAGER_PRIVKEY`: Path to your private key (Exemple: `/package/config/my-key.rsa.priv`)
-* `PACKAGER_PUBKEY`: Path to your public key (Exemple: `/package/config/my-key.rsa.pub`)  
-Your public key is automaticaly copied to `/etc/apk/keys/`
+* `PACKAGER_PRIVKEY`: Path to your private key (Exemple: `/config/my-key.rsa.priv`)
+* `PACKAGER_PUBKEY`: Path to your public key (Exemple: `/config/my-key.rsa.pub`)  
+
+Your public key is automatically copied to `/etc/apk/keys/` inside the container and to  `/public` folder.
 
 ## ![](https://github.com/docker-suite/artwork/raw/master/various/pin/png/pin_16.png) Usage
 ### Create your package
 
-Create an `APKBUILD` file and place it in your `package` folder  
-Run apk-builder to generate your package.  
-The resulting apk file and signed index can be found in  `packages` folder  
+Create your package with an `APKBUILD` file and place it in your `packages` folder  
+Run apk-builder to generate your package(s).  
+The resulting apk file and signed index can be found in  `public` folder  
 
 ```bash
-    docker run \
-        -v $PWD/package:/package \
+    docker run -t --rm \
+        -v $PWD/config:/config \
         -v $PWD/packages:/packages \
-        dsuite/apk-builder:3.9
+        -v $PWD/public:/public \
+        dsuite/apk-builder:3.10 package
 ```
 
 See: [hugo-apk example][hugo-apk] for more details.
@@ -57,21 +57,17 @@ Or with an existing RSA key
 ```bash
     docker run \
 	    -e RSA_KEY_NAME="my-key.rsa" \
-        -e PACKAGER_PRIVKEY="$PWD/package/config/my-key.rsa.pub" \
-        -e PACKAGER_PUBKEY="$PWD/package/config/my-key.rsa.priv" \
-        -v $PWD/package:/package \
+        -e PACKAGER_PRIVKEY="$PWD/config/my-key.rsa.pub" \
+        -e PACKAGER_PUBKEY="$PWD/config/my-key.rsa.priv" \
         -v $PWD/packages:/packages \
-        dsuite/apk-builder:3.9
+        -v $PWD/public:/public \
+        dsuite/apk-builder:3.10 package
 ```
 
-This would build the package in your **$PWD/package** local folder, and place the resulting packages in the **$PWD/packages/v3.9/x86_64** folder.
+This would build the packages in your **$PWD/packages** local folder, and place the resulting packages in the **$PWD/public/v3.10/x86_64** folder.
 
 ### ![](https://github.com/docker-suite/artwork/raw/master/various/pin/png/pin_16.png) Generate new key pair:
-```docker run --rm -t -v $PWD:/package/config dsuite/apk-builder abuild-keygen -n```
-
-### ![](https://github.com/docker-suite/artwork/raw/master/various/pin/png/pin_16.png) rebuild checksums:
-```docker run --rm -t -v $PWD/package:/package dsuite/apk-builder abuild checksum```
-
+```docker run --rm -t -e RSA_KEY_NAME="my-key.rsa" -v $PWD/config:/config dsuite/apk-builder```
 
 ## ![](https://github.com/docker-suite/artwork/raw/master/various/pin/png/pin_16.png) Examples
 Two examples can be found in the [.example][example-folder] folder

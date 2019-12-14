@@ -1,0 +1,119 @@
+#!/usr/bin/env bash
+
+# shellcheck disable=SC1091
+source /usr/local/lib/bash-logger.sh && LOG_RESET
+
+# set -e : Exit the script if any statement returns a non-true return value.
+# set -u : Exit the script when using uninitialised variable.
+set -eu
+
+# ------------------------------------------------------------------------------
+#
+#   Build packages
+#
+# ------------------------------------------------------------------------------
+
+
+
+# List of all packages
+packages="$(find /packages -name '*' -type d -mindepth 1 -maxdepth 1 -exec test -e '{}/APKBUILD' \; -print | sort -u)"
+
+# Check for a list of packages to build
+while [[ $# -gt 0 ]]; do
+    # help
+    if [[ "$1" = "-h" ]] || [[ "$1" = "--help" ]]; then
+        echo "Build script"
+        echo ""
+        echo "Script for building Alpine packages"
+        echo ""
+        echo "SYNOPSIS:"
+        echo "  package [<options>]"
+        echo ""
+        echo "OPTIONS:"
+        echo "  -h, --help         Display this help."
+        echo "  -p, --package     'package_name...'"
+        exit 0;
+    fi
+
+    # packages
+    if [[ "$1" = "-p" ]] || [[ "$1" = "--packages" ]]; then
+        packages="${2#\/packages\/}"
+        DEBUG "Package '$packages' will be build"
+    fi
+
+  shift
+done
+
+# Search for package dependencies
+find_dependencies() {
+    local package="${1#\/packages\/}"
+    local dependencies=""
+    DEBUG "Searching for '$package' dependencies..."
+    # Check if package exist
+    if [[ -d "/packages/$package" ]]; then
+        # Search for all folders containing APKBUILD file
+        dependencies="$(find "/packages/$package" -name '*'  \( -type d -o -type l \) -mindepth 1 -maxdepth 1 -exec test -e '{}/APKBUILD' \; -print | sort -u)"
+        # Iterate throw all dependencies
+        for dependency in $dependencies; do
+            dependency="${dependency#\/packages\/}"
+            DEBUG "Found '$dependency' as '$package' dependency"
+            # Test if the dependency is a symlink to a directory
+            if [[ -L "/packages/$dependency" && -d "/packages/$dependency" ]]; then
+                dependency=$(readlink -f "$dependency")
+            fi
+            # Add dependency as a package to build
+            packages="$dependency $packages"
+            # Search for depedencies of the dependency
+            find_dependencies $dependency
+        done
+    else
+        WARNING "Package '$package' does not exist"
+    fi
+}
+
+# Search for packages dependencies
+for package in $packages; do
+    find_dependencies "$package"
+done
+
+# Remove duplicate package in the right order
+# to prevent from building the same package multiple times
+packages=$(echo "$packages"  | awk -v RS="[ \n]+" '!n[$0]++')
+
+# Build packages
+for package in $packages; do
+    package="${package#\/packages\/}"
+    if [[ -d "/packages/$package" ]]; then
+        NOTICE "Building package : $package"
+
+        ## Move to the package to build
+        cd "/packages/$package"
+
+        # Clean before starting
+        sudo rm -rf tmp
+
+        # Update repository indexes
+        sudo -E apk update
+
+        # Clean pkgdir and srcdir
+        abuild clean
+
+        # Generate checksum to be included in APKBUILD
+        abuild checksum
+
+        # Build from APKBUILD
+        # -r Install missing dependencies from system repository (using sudo)
+        # -K Keep buildtime temp dirs and files (srcdir/pkgdir/deps)
+        # -u Recursively build and upgrade all dependencies (using sudo)
+        abuild -r -K -u
+
+        # Generate index with trusted signature
+        generate-index
+
+        # Remove binary packages except current version
+        abuild cleanoldpkg
+
+        # Regenerate index with trusted signature
+        generate-index
+    fi
+done
