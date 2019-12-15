@@ -23,18 +23,9 @@ ENV PACKAGER_PRIVKEY /config/$RSA_KEY_NAME.priv
 ENV PACKAGER_PUBKEY /config/$RSA_KEY_NAME.pub
 
 ## User who will build all packages
-ENV USER packager
-
-## Create packager user and make it member of group abuild
-RUN \
-	# Print executed commands
-	set -x \
-    # Create packager user member of group abuild
-    && adduser -S -D -G abuild -g "Alpine Package Builder" -s /bin/bash "packager" \
-    # Make our packager user like sudo
-    && echo "packager ALL=(ALL) ALL" >> /etc/sudoers \
-    && echo "packager ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
-
+ENV NEW_USER=packager \
+    NEW_GROUP=abuild \
+    USER=packager
 
 
 ## Install latest version of alpine-sdk
@@ -56,7 +47,7 @@ RUN \
 
 
 ## Copy scripts
-COPY --chown=packager:abuild /rootfs /
+COPY /rootfs /
 
 ## Define the default working folder
 WORKDIR /packages
