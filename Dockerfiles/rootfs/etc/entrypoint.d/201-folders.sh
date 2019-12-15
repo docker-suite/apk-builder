@@ -14,13 +14,13 @@ fi
 chown -R "$USER":abuild /etc/apk/keys
 
 #
-# /home/$USER/.abuild
+# $HOME/.abuild
 #
-if [[ ! -d "/home/$USER/.abuild" ]]; then
-    DEBUG "Creating folder: /home/$USER/.abuild"
-    mkdir -p "/home/$USER/.abuild"
+if [[ ! -d "$HOME/.abuild" ]]; then
+    DEBUG "Creating folder: $HOME/.abuild"
+    mkdir -p "$HOME/.abuild"
 fi
-chown -R "$USER":abuild "/home/$USER/.abuild"
+chown -R "$USER":abuild "$HOME/.abuild"
 
 
 #

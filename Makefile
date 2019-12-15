@@ -5,7 +5,7 @@ DOCKER_IMAGE=dsuite/apk-builder
 DIR:=$(strip $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST)))))
 
 ## Define the latest version
-latest = 3.9
+latest = 3.10
 
 ##
 .DEFAULT_GOAL := help

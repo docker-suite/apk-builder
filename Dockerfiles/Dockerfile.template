@@ -25,6 +25,7 @@ ENV PACKAGER_PUBKEY /config/$RSA_KEY_NAME.pub
 ## User who will build all packages
 ENV NEW_USER=packager \
     NEW_GROUP=abuild \
+    NEW_HOME=/home/packager \
     USER=packager
 
 
