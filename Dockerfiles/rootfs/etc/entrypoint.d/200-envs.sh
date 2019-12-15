@@ -12,4 +12,4 @@ env_set "ALPINE_VERSION" "$(env_get "ALPINE_VERSION")"
 #
 # OS architecture
 #
-env_set "ALPINE_ARCH" "$(arch)"
+env_set "ALPINE_ARCH" "$(uname -m)"
