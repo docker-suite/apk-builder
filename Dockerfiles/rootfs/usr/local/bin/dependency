@@ -13,6 +13,22 @@ set -eu
 #
 # ------------------------------------------------------------------------------
 
+usage() {
+    echo "Dependecy helper"
+    echo ""
+    echo "Script for adding/removing package dependenceis"
+    echo ""
+    echo "SYNOPSIS:"
+    echo "  dependency add [<options>]"
+    echo "  dependency remove [<options>]"
+    echo ""
+    echo "OPTIONS:"
+    echo "  -h, --help          Display this help."
+    echo "  -p, --packages      'package_name...'"
+    echo "  -d, --dependencies  'package_name...'"
+    exit 0;
+}
+
 # Help
 if [ $# -eq 0 ]; then
     usage
@@ -49,23 +65,7 @@ while [ $# -gt 0 ]; do
   shift
 done
 
-usage() {
-    echo "Dependecy helper"
-    echo ""
-    echo "Script for adding/removing package dependenceis"
-    echo ""
-    echo "SYNOPSIS:"
-    echo "  dependency add [<options>]"
-    echo "  dependency remove [<options>]"
-    echo ""
-    echo "OPTIONS:"
-    echo "  -h, --help          Display this help."
-    echo "  -p, --packages      'package_name...'"
-    echo "  -d, --dependencies  'package_name...'"
-    exit 0;
-}
-
-# Check if package exis
+# Check if package exist
 for package in $packages; do
     if [ ! -d "/packages/$package" ]; then
         WARNING "Unable to find package '$package'"
@@ -73,7 +73,7 @@ for package in $packages; do
     fi
 done
 
-# Check if dependency exis
+# Check if dependency exist
 for dependency in $dependencies; do
     if [ ! -d "/packages/$dependency" ]; then
         WARNING "Unable to find dependency '$dependency'"
@@ -89,7 +89,7 @@ for package in $packages; do
         if [ $action = "add" ];then
             DEBUG "Adding '$dependency' as a dependency of '$package'"
             rm -rf "/packages/$package/$dependency"
-            ln -s "/packages/$dependency/" "/packages/$package/$dependency"
+            ln -s -r "/packages/$dependency/" "/packages/$package/$dependency"
         fi
         # Remove
         if [ $action = "remove" ];then
