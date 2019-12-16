@@ -76,6 +76,9 @@ for package in $packages; do
     find_dependencies "$package"
 done
 
+# Update repository indexes
+sudo -E apk update
+
 # Remove duplicate package in the right order
 # to prevent from building the same package multiple times
 packages=$(echo "$packages"  | awk -v RS="[ \n]+" '!n[$0]++')
@@ -91,9 +94,6 @@ for package in $packages; do
 
         # Clean before starting
         sudo rm -rf tmp
-
-        # Update repository indexes
-        sudo -E apk update
 
         # Clean pkgdir and srcdir
         abuild clean
