@@ -101,11 +101,13 @@ for package in $packages; do
         # Generate checksum to be included in APKBUILD
         abuild checksum
 
+        # Install packages listed in makedepends and depends
+        abuild deps
+
         # Build from APKBUILD
         # -r Install missing dependencies from system repository (using sudo)
         # -K Keep buildtime temp dirs and files (srcdir/pkgdir/deps)
-        # -u Recursively build and upgrade all dependencies (using sudo)
-        abuild -r -K -u
+        abuild -r -K
 
         # Generate index with trusted signature
         generate-index
