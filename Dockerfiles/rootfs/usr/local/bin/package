@@ -14,9 +14,8 @@ set -eu
 # ------------------------------------------------------------------------------
 
 
-
 # List of all packages
-packages="$(find /packages -name '*' -type d -mindepth 1 -maxdepth 1 -exec test -e '{}/APKBUILD' \; -print | sort -u)"
+packages="$(find . -name '*' \( -type d -o -type l \) -mindepth 1 -maxdepth 1 -exec test -e '{}/APKBUILD' \; -print | sort -u)"
 
 # Check for a list of packages to build
 while [[ $# -gt 0 ]]; do
@@ -37,38 +36,52 @@ while [[ $# -gt 0 ]]; do
 
     # packages
     if [[ "$1" = "-p" ]] || [[ "$1" = "--packages" ]]; then
-        packages="${2#\/packages\/}"
-        DEBUG "Package '$packages' will be build"
+        packages=${2}
     fi
 
   shift
 done
 
-# Search for package dependencies
-find_dependencies() {
-    local package="${1#\/packages\/}"
-    local dependencies=""
-    DEBUG "Searching for '$package' dependencies..."
-    # Check if package exist
-    if [[ -d "/packages/$package" ]]; then
-        # Search for all folders containing APKBUILD file
-        dependencies="$(find "/packages/$package" -name '*'  \( -type d -o -type l \) -mindepth 1 -maxdepth 1 -exec test -e '{}/APKBUILD' \; -print | sort -u)"
-        # Iterate throw all dependencies
-        for dependency in $dependencies; do
-            dependency="${dependency#\/packages\/}"
-            DEBUG "Found '$dependency' as '$package' dependency"
-            # Test if the dependency is a symlink to a directory
-            if [[ -L "/packages/$dependency" && -d "/packages/$dependency" ]]; then
-                dependency=$(readlink -f "$dependency")
-            fi
-            # Add dependency as a package to build
-            packages="$dependency $packages"
-            # Search for depedencies of the dependency
-            find_dependencies $dependency
-        done
+# Get real path of each package
+package_temp=$packages; packages=""
+for package in $package_temp; do
+    # Test if the package is a symlink to a directory
+    if [[ -L "$package" && -d "$package" ]]; then
+        package=$(readlink -f "$package")
+    fi
+    # package should be a directory
+    if [[ -d "$package" ]]; then
+        packages="$packages $(realpath "$package")"
+        DEBUG "Package $(basename "$package") will be build."
     else
         WARNING "Package '$package' does not exist"
     fi
+done
+
+# Function to search for package dependencies
+find_dependencies() {
+    local package="${1}"
+    local dependencies=""
+    DEBUG "Searching for '$(basename "$package")' dependencies..."
+    # Search for all folders containing APKBUILD file
+    dependencies="$(find "$package" -name '*'  \( -type d -o -type l \) -mindepth 1 -maxdepth 1 -exec test -e '{}/APKBUILD' \; -print | sort -u)"
+    # Iterate throw all dependencies
+    for dependency in $dependencies; do
+        DEBUG "Found '$(basename "$dependency")' as '$(basename "$package")' dependency"
+        # Test if the dependency is a symlink to a directory
+        if [[ -L "$dependency" && -d "$dependency" ]]; then
+            dependency=$(readlink -f "$dependency")
+        fi
+        # dependency should be a directory
+        if [[ -d "$dependency" ]]; then
+            # Add dependency as a package to build
+            packages="$dependency $packages"
+            # Search for depedencies of the dependency
+            find_dependencies "$dependency"
+        else
+            WARNING "Package '$package' does not exist"
+        fi
+    done
 }
 
 # Search for packages dependencies
@@ -82,15 +95,11 @@ packages=$(echo "$packages"  | awk -v RS="[ \n]+" '!n[$0]++')
 
 # Build packages
 for package in $packages; do
-    package="${package#\/packages\/}"
-    if [[ -d "/packages/$package" ]]; then
-        NOTICE "Building package : $package"
+    if [[ -d "$package" ]]; then
+        NOTICE "Building package : $(basename "$package")"
 
         ## Move to the package to build
-        cd "/packages/$package"
-
-        # Clean before starting
-        sudo rm -rf tmp
+        cd "$package"
 
         # Update repository indexes
         sudo -E apk update
