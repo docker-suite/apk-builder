@@ -101,6 +101,15 @@ for package in $packages; do
         ## Move to the package to build
         cd "$package"
 
+        ## Get package parent folder
+        parent="$(dirname "$package")"
+        parent="${parent#/packages/}"
+
+        # Force generated packages to be store in /public folder
+        if [[ ! "$parent" = "" ]] && [[ ! -a "/home/$USER/$parent" ]]; then
+            ln -s "/public/v${ALPINE_VERSION}/" "/home/$USER/$parent"
+        fi
+
         # Update repository indexes
         sudo -E apk update
 
@@ -116,7 +125,7 @@ for package in $packages; do
         # Build from APKBUILD
         # -r Install missing dependencies from system repository (using sudo)
         # -K Keep buildtime temp dirs and files (srcdir/pkgdir/deps)
-        abuild -r -K
+        abuild -r -K -P "/home/$USER"
 
         # Generate index with trusted signature
         generate-index
