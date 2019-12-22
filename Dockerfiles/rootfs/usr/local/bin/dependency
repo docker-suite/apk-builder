@@ -67,7 +67,7 @@ done
 
 # Check if package exist
 for package in $packages; do
-    if [ ! -d "/packages/$package" ]; then
+    if [ ! -d "$package" ]; then
         WARNING "Unable to find package '$package'"
         exit 2
     fi
@@ -75,7 +75,7 @@ done
 
 # Check if dependency exist
 for dependency in $dependencies; do
-    if [ ! -d "/packages/$dependency" ]; then
+    if [ ! -d "$dependency" ]; then
         WARNING "Unable to find dependency '$dependency'"
         exit 2
     fi
@@ -88,13 +88,13 @@ for package in $packages; do
         # Add
         if [ $action = "add" ];then
             DEBUG "Adding '$dependency' as a dependency of '$package'"
-            rm -rf "/packages/$package/$dependency"
-            ln -s -r "/packages/$dependency/" "/packages/$package/$dependency"
+            rm -rf "$package/$dependency"
+            ln -s -r "$dependency/" "$package/$dependency"
         fi
         # Remove
         if [ $action = "remove" ];then
             DEBUG "Removing '$dependency' as a dependency of '$package'"
-            rm -rf "/packages/$package/$dependency"
+            rm -rf "$package/$dependency"
         fi
     done
 done
