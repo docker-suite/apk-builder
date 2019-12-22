@@ -4,5 +4,6 @@
 **/public
 
 **/Dockerfile-*
+**/Dockerfile.*-*
 **/*.rsa.priv
 **/*.rsa.pub

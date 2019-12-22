@@ -26,22 +26,34 @@ build: ## Build all versions
 	@$(MAKE) build-version v=3.8
 	@$(MAKE) build-version v=3.9
 	@$(MAKE) build-version v=3.10
+	@$(MAKE) build-dev-version v=3.7
+	@$(MAKE) build-dev-version v=3.8
+	@$(MAKE) build-dev-version v=3.9
+	@$(MAKE) build-dev-version v=3.10
 
 test: ## Test all versions
 	$(MAKE) test-version v=3.7
 	$(MAKE) test-version v=3.8
 	$(MAKE) test-version v=3.9
 	$(MAKE) test-version v=3.10
+	$(MAKE) test-dev-version v=3.7
+	$(MAKE) test-dev-version v=3.8
+	$(MAKE) test-dev-version v=3.9
+	$(MAKE) test-dev-version v=3.10
 
 push: ## Push all versions
 	$(MAKE) push-version v=3.7
 	$(MAKE) push-version v=3.8
 	$(MAKE) push-version v=3.9
 	$(MAKE) push-version v=3.10
+	$(MAKE) push-dev-version v=3.7
+	$(MAKE) push-dev-version v=3.8
+	$(MAKE) push-dev-version v=3.9
+	$(MAKE) push-dev-version v=3.10
 
 shell: ## Run shell ( usage : make shell v="3.10" )
 	$(eval version := $(or $(v),$(latest)))
-	@$(MAKE) build-version v=$(version)
+	@$(MAKE) build-dev-version v=$(version)
 	@mkdir -p $(DIR)/config
 	@mkdir -p $(DIR)/packages
 	@mkdir -p $(DIR)/public
@@ -52,12 +64,12 @@ shell: ## Run shell ( usage : make shell v="3.10" )
 		-v $(DIR)/config:/config \
 		-v $(DIR)/packages:/packages \
 		-v $(DIR)/public:/public \
-		$(DOCKER_IMAGE):$(version) \
+		$(DOCKER_IMAGE)-dev:$(version) \
 		bash
 
 package: ## Build all packages
 	$(eval version := $(or $(v),$(latest)))
-	@$(MAKE) build-version v=$(version)
+	@$(MAKE) build-dev-version v=$(version)
 	@mkdir -p $(DIR)/config
 	@mkdir -p $(DIR)/packages
 	@mkdir -p $(DIR)/public
@@ -68,12 +80,12 @@ package: ## Build all packages
 		-v $(DIR)/config:/config \
 		-v $(DIR)/packages:/packages \
 		-v $(DIR)/public:/public \
-		$(DOCKER_IMAGE):$(version) \
+		$(DOCKER_IMAGE)-dev:$(version) \
 		bash -c "package"
 
-key: ## Generate nex private and public keys
+key: ## Generate new private and public keys
 	$(eval version := $(or $(v),$(latest)))
-	@$(MAKE) build-version v=$(version)
+	@$(MAKE) build-dev-version v=$(version)
 	@mkdir -p $(DIR)/config
 	@mkdir -p $(DIR)/packages
 	@mkdir -p $(DIR)/public
@@ -83,10 +95,11 @@ key: ## Generate nex private and public keys
 		-e DEBUG_LEVEL=DEBUG \
 		-e RSA_KEY_NAME=my-key.rsa \
 		-v $(DIR)/config:/config \
-		$(DOCKER_IMAGE):$(version)
+		$(DOCKER_IMAGE)-dev:$(version)
 		exit
 
 remove: ## Remove all generated images
+	@docker images | grep $(DOCKER_IMAGE)-dev | tr -s ' ' | cut -d ' ' -f 2 | xargs -I {} docker rmi $(DOCKER_IMAGE)-dev:{}
 	@docker images | grep $(DOCKER_IMAGE) | tr -s ' ' | cut -d ' ' -f 2 | xargs -I {} docker rmi $(DOCKER_IMAGE):{}
 
 readme: ## Generate docker hub full description
@@ -117,6 +130,24 @@ build-version:
 		$(DIR)/Dockerfiles
 	@[ "$(version)" = "$(latest)" ] && docker tag $(DOCKER_IMAGE):$(version) $(DOCKER_IMAGE):latest || true
 
+build-dev-version:
+	$(eval version := $(or $(v),$(latest)))
+	@$(MAKE) build-version v=$(version)
+	@docker run --rm \
+		-e http_proxy=${http_proxy} \
+		-e https_proxy=${https_proxy} \
+		-e ALPINE_VERSION=$(version) \
+		-v $(DIR)/Dockerfiles:/data \
+		dsuite/alpine-data \
+		bash -c "templater Dockerfile.dev.template > Dockerfile.dev-$(version)"
+	@docker build \
+		--build-arg http_proxy=${http_proxy} \
+		--build-arg https_proxy=${https_proxy} \
+		--file $(DIR)/Dockerfiles/Dockerfile.dev-$(version) \
+		--tag $(DOCKER_IMAGE)-dev:$(version) \
+		$(DIR)/Dockerfiles
+	@[ "$(version)" = "$(latest)" ] && docker tag $(DOCKER_IMAGE)-dev:$(version) $(DOCKER_IMAGE)-dev:latest || true
+
 test-version:
 	$(eval version := $(or $(v),$(latest)))
 	@$(MAKE) build-version v=$(version)
@@ -129,8 +160,26 @@ test-version:
 		dsuite/goss:latest \
 		dgoss run --entrypoint=/goss/entrypoint.sh $(DOCKER_IMAGE):$(version)
 
+test-dev-version:
+	$(eval version := $(or $(v),$(latest)))
+	@$(MAKE) build-dev-version v=$(version)
+	@docker run --rm -t \
+		-e http_proxy=${http_proxy} \
+		-e https_proxy=${https_proxy} \
+		-v $(DIR)/tests:/goss \
+		-v /tmp:/tmp \
+		-v /var/run/docker.sock:/var/run/docker.sock \
+		dsuite/goss:latest \
+		dgoss run --entrypoint=/goss/entrypoint.sh $(DOCKER_IMAGE)-dev:$(version)
+
 push-version:
 	$(eval version := $(or $(v),$(latest)))
 	@$(MAKE) build-version v=$(version)
 	@docker push $(DOCKER_IMAGE):$(version)
 	@[ "$(version)" = "$(latest)" ] && docker push $(DOCKER_IMAGE):latest || true
+
+push-dev-version:
+	$(eval version := $(or $(v),$(latest)))
+	@$(MAKE) build-dev-version v=$(version)
+	@docker push $(DOCKER_IMAGE)-dev:$(version)
+	@[ "$(version)" = "$(latest)" ] && docker push $(DOCKER_IMAGE)-dev:latest || true

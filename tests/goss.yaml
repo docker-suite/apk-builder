@@ -25,8 +25,8 @@ group:
 user:
   packager:
     exists: true
-    uid: 100
-    gid: 300
+    uid: 1000
+    gid: 1000
     groups:
     - abuild
     skip: false

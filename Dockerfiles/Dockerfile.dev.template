@@ -1,0 +1,25 @@
+FROM dsuite/apk-builder:{{ALPINE_VERSION}}
+
+LABEL maintainer="Hexosse <hexosse@gmail.com>" \
+      description="Alpine package builder (dev)." \
+      vendor="docker-suite" \
+      license="MIT"
+
+
+## Install dev package commonly used
+RUN \
+	# Print executed commands
+	set -x \
+    # Update repository indexes
+    && apk-update \
+    # Install latest versions of packages included in alpine-sdk
+    && apk-install \
+        autoconf apache2-dev aspell-dev	bison bzip2-dev curl-dev db-dev \
+        enchant-dev freetds-dev file freetype-dev gd-dev gdbm-dev gettext-dev \
+        gmp-dev icu-dev imap-dev krb5-dev libedit-dev libical-dev libjpeg-turbo-dev \
+        libmcrypt-dev libpng-dev libressl-dev libwebp-dev libxml2-dev \
+        libxpm-dev libxslt-dev libzip-dev net-snmp-dev openldap-dev pcre-dev \
+        postgresql-dev re2c recode-dev sqlite-dev tidyhtml-dev unixodbc-dev \
+        zlib-dev \
+	# Clear apk's cache
+	&& apk-cleanup
