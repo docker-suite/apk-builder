@@ -18,8 +18,8 @@ RUN \
         enchant-dev freetds-dev file freetype-dev gd-dev gdbm-dev gettext-dev \
         gmp-dev icu-dev imap-dev krb5-dev libedit-dev libical-dev libjpeg-turbo-dev \
         libmcrypt-dev libpng-dev libressl-dev libsodium-dev libwebp-dev libxml2-dev \
-        libxpm-dev libxslt-dev libzip-dev net-snmp-dev openldap-dev pcre-dev \
-        postgresql-dev re2c recode-dev sqlite-dev tidyhtml-dev unixodbc-dev \
+        libxpm-dev libxslt-dev libzip-dev net-snmp-dev openldap-dev pcre-dev pcre2-dev \
+        postgresql-dev re2c recode-dev sqlite-dev tidyhtml-dev unixodbc-dev valgrind \
         zlib-dev \
 	# Clear apk's cache
 	&& apk-cleanup
