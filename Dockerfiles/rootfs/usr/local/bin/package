@@ -36,10 +36,13 @@ while [[ $# -gt 0 ]]; do
 
     # packages
     if [[ "$1" = "-p" ]] || [[ "$1" = "--packages" ]]; then
-        packages=${2}
+        packages=""
+        for package in ${2}; do
+            packages="$packages $package"
+        done
     fi
 
-  shift
+    shift
 done
 
 # Get real path of each package
