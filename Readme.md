@@ -47,7 +47,7 @@ The resulting apk file and signed index can be found in  `public` folder
         -v $PWD/config:/config \
         -v $PWD/packages:/packages \
         -v $PWD/public:/public \
-        dsuite/apk-builder:3.10 package
+        dsuite/apk-builder:3.11 package
 ```
 
 See: [hugo-apk example][hugo-apk] for more details.
@@ -61,10 +61,10 @@ Or with an existing RSA key
         -e PACKAGER_PUBKEY="$PWD/config/my-key.rsa.priv" \
         -v $PWD/packages:/packages \
         -v $PWD/public:/public \
-        dsuite/apk-builder:3.10 package
+        dsuite/apk-builder:3.11 package
 ```
 
-This would build the packages in your **$PWD/packages** local folder, and place the resulting packages in the **$PWD/public/v3.10/x86_64** folder.
+This would build the packages in your **$PWD/packages** local folder, and place the resulting packages in the **$PWD/public/v3.11/x86_64** folder.
 
 ### ![](https://github.com/docker-suite/artwork/raw/master/various/pin/png/pin_16.png) Generate new key pair:
 ```docker run --rm -t -e RSA_KEY_NAME="my-key.rsa" -v $PWD/config:/config dsuite/apk-builder```
