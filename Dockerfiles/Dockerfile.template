@@ -37,12 +37,20 @@ RUN \
 	set -x \
     # Update repository indexes
     && apk-update \
+    # Upgrade currently installed packages to match repositories
+    && apk upgrade --no-cache --available \
     # Install latest versions of packages included in alpine-sdk
     && apk-install \
-        # alpine-sdk
+        # Alpine configuration management scripts
+        alpine-conf \
+        # Alpine Software Development Kit meta package
         alpine-sdk \
+        # A fast C/C++ compiler cache
+        ccache \
         # common tools
         cmake coreutils \
+    # Setup apk caching
+    && setup-apkcache /var/cache/apk \
 	# Clear apk's cache
 	&& apk-cleanup
 
