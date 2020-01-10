@@ -20,7 +20,7 @@ RUN \
         libjpeg-turbo-dev libmcrypt-dev libmemcached-dev libpng-dev libressl-dev \
         libsodium-dev libtool libwebp-dev libxml2-dev libxpm-dev libxslt-dev \
         libzip-dev net-snmp-dev openldap-dev pcre-dev pcre2-dev postgresql-dev \
-        re2c recode-dev sqlite-dev tidyhtml-dev unixodbc-dev util-linux-dev \
+        re2c recode-dev samba-dev sqlite-dev tidyhtml-dev unixodbc-dev util-linux-dev \
         valgrind yaml-dev zlib-dev \
 	# Clear apk's cache
 	&& apk-cleanup
