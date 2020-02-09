@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+# ------------------------------------------------------------------------------
+#
+#   Remmove index file APKINDEX.tar.gz
+#
+# ------------------------------------------------------------------------------
+
+# set -e : Exit the script if any statement returns a non-true return value.
+# set -u : Exit the script when using uninitialised variable.
+set -eu
+
+if [ -f "/public/v$ALPINE_VERSION/$ALPINE_ARCH/APKINDEX.tar.gz" ]; then
+    rm -f "/public/v$ALPINE_VERSION/$ALPINE_ARCH/APKINDEX.tar.gz"
+fi

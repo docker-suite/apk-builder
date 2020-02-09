@@ -125,6 +125,9 @@ for package in $packages; do
         # Install packages listed in makedepends and depends
         abuild deps
 
+        # Remove existing index has it will be generated later
+        remove-index
+
         # Build from APKBUILD
         # -r Install missing dependencies from system repository (using sudo)
         # -K Keep buildtime temp dirs and files (srcdir/pkgdir/deps)
