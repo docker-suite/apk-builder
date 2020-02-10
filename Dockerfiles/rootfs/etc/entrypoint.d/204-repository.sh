@@ -13,8 +13,5 @@ echo "/public/v$ALPINE_VERSION" >> /etc/apk/repositories
 # Sign index if exist
 #
 if [ -f "/public/v$ALPINE_VERSION/$ALPINE_ARCH/APKINDEX.tar.gz" ]; then
-    # Sign existing index
-    abuild-sign -k "$PACKAGER_PRIVKEY" -p "$RSA_KEY_NAME.pub" "/public/v$ALPINE_VERSION/$ALPINE_ARCH/APKINDEX.tar.gz"
-    # Update permissions
-    sudo chmod 644 "/public/v$ALPINE_VERSION/$ALPINE_ARCH/APKINDEX.tar.gz"
+    generate-index
 fi

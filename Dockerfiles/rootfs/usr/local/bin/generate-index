@@ -13,11 +13,23 @@ set -eu
 # cd to package folder
 cd "/public/v$ALPINE_VERSION/$ALPINE_ARCH"
 
-# Create APKINDEX.tar.gz file
-apk index -vU -o APKINDEX.tar.gz *.apk
+# Regenerate indexes in $REPODEST
+# Create APKINDEX.unsigned.tar.gz
+apk index -o APKINDEX.unsigned.tar.gz *.apk --rewrite-arch "$ALPINE_ARCH"
 
-# Sign APKINDEX.tar.gz file
-abuild-sign -k $PACKAGER_PRIVKEY -p $RSA_KEY_NAME.pub APKINDEX.tar.gz
+# Digitally sign the digest using the private key
+openssl dgst -sha1 -sign "$PACKAGER_PRIVKEY" -out ".SIGN.RSA.$RSA_KEY_NAME.pub" APKINDEX.unsigned.tar.gz
 
-# Update permissions
+# tar signed file
+# tar -c ".SIGN.RSA.$RSA_KEY_NAME.pub" | abuild-tar --cut | gzip -9 > signature.tar.gz
+tar -f - -c ".SIGN.RSA.$RSA_KEY_NAME.pub" | abuild-tar --cut | gzip -n -9 > signature.tar.gz
+
+# Generate APKINDEX file
+cat signature.tar.gz APKINDEX.unsigned.tar.gz > APKINDEX.tar.gz
+
+#
 sudo chmod 644 APKINDEX.tar.gz
+
+# Clean up
+rm APKINDEX.unsigned.tar.gz signature.tar.gz ".SIGN.RSA.$RSA_KEY_NAME.pub"
+
