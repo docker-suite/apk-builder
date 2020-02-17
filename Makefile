@@ -24,44 +24,43 @@ clean: ## Clean the workspace
 
 build: ## Build all versions
 	@$(MAKE) clean
-	@$(MAKE) build-version v=3.7
-	@$(MAKE) build-version v=3.8
-	@$(MAKE) build-version v=3.9
-	@$(MAKE) build-version v=3.10
 	@$(MAKE) build-version v=3.11
-	@$(MAKE) build-dev-version v=3.7
-	@$(MAKE) build-dev-version v=3.8
-	@$(MAKE) build-dev-version v=3.9
-	@$(MAKE) build-dev-version v=3.10
 	@$(MAKE) build-dev-version v=3.11
+	@$(MAKE) build-version v=3.10
+	@$(MAKE) build-dev-version v=3.10
+	@$(MAKE) build-version v=3.9
+	@$(MAKE) build-dev-version v=3.9
+	@$(MAKE) build-version v=3.8
+	@$(MAKE) build-dev-version v=3.8
+	@$(MAKE) build-version v=3.7
+	@$(MAKE) build-dev-version v=3.7
 
 test: ## Test all versions
-	$(MAKE) test-version v=3.7
-	$(MAKE) test-version v=3.8
-	$(MAKE) test-version v=3.9
-	$(MAKE) test-version v=3.10
 	$(MAKE) test-version v=3.11
-	$(MAKE) test-dev-version v=3.7
-	$(MAKE) test-dev-version v=3.8
-	$(MAKE) test-dev-version v=3.9
-	$(MAKE) test-dev-version v=3.10
 	$(MAKE) test-dev-version v=3.11
+	$(MAKE) test-version v=3.10
+	$(MAKE) test-dev-version v=3.10
+	$(MAKE) test-version v=3.9
+	$(MAKE) test-dev-version v=3.9
+	$(MAKE) test-version v=3.8
+	$(MAKE) test-dev-version v=3.8
+	$(MAKE) test-version v=3.7
+	$(MAKE) test-dev-version v=3.7
 
 push: ## Push all versions
-	$(MAKE) push-version v=3.7
-	$(MAKE) push-version v=3.8
-	$(MAKE) push-version v=3.9
-	$(MAKE) push-version v=3.10
 	$(MAKE) push-version v=3.11
-	$(MAKE) push-dev-version v=3.7
-	$(MAKE) push-dev-version v=3.8
-	$(MAKE) push-dev-version v=3.9
-	$(MAKE) push-dev-version v=3.10
 	$(MAKE) push-dev-version v=3.11
+	$(MAKE) push-version v=3.10
+	$(MAKE) push-dev-version v=3.10
+	$(MAKE) push-version v=3.9
+	$(MAKE) push-dev-version v=3.9
+	$(MAKE) push-version v=3.8
+	$(MAKE) push-dev-version v=3.8
+	$(MAKE) push-version v=3.7
+	$(MAKE) push-dev-version v=3.7
 
 shell: ## Run shell ( usage : make shell v="3.11" )
 	$(eval version := $(or $(v),$(latest)))
-	@$(MAKE) build-dev-version v=$(version)
 	@mkdir -p $(DIR)/config
 	@mkdir -p $(DIR)/packages
 	@mkdir -p $(DIR)/public
@@ -77,7 +76,6 @@ shell: ## Run shell ( usage : make shell v="3.11" )
 
 package: ## Build all packages
 	$(eval version := $(or $(v),$(latest)))
-	@$(MAKE) build-dev-version v=$(version)
 	@mkdir -p $(DIR)/config
 	@mkdir -p $(DIR)/packages
 	@mkdir -p $(DIR)/public
@@ -93,7 +91,6 @@ package: ## Build all packages
 
 key: ## Generate new private and public keys
 	$(eval version := $(or $(v),$(latest)))
-	@$(MAKE) build-dev-version v=$(version)
 	@mkdir -p $(DIR)/config
 	@mkdir -p $(DIR)/packages
 	@mkdir -p $(DIR)/public
@@ -142,7 +139,6 @@ build-version:
 
 build-dev-version:
 	$(eval version := $(or $(v),$(latest)))
-	@$(MAKE) build-version v=$(version)
 	@docker run --rm \
 		-e http_proxy=${http_proxy} \
 		-e https_proxy=${https_proxy} \
@@ -160,7 +156,6 @@ build-dev-version:
 
 test-version:
 	$(eval version := $(or $(v),$(latest)))
-	@$(MAKE) build-version v=$(version)
 	@docker run --rm -t \
 		-e http_proxy=${http_proxy} \
 		-e https_proxy=${https_proxy} \
@@ -172,7 +167,6 @@ test-version:
 
 test-dev-version:
 	$(eval version := $(or $(v),$(latest)))
-	@$(MAKE) build-dev-version v=$(version)
 	@docker run --rm -t \
 		-e http_proxy=${http_proxy} \
 		-e https_proxy=${https_proxy} \
@@ -184,12 +178,10 @@ test-dev-version:
 
 push-version:
 	$(eval version := $(or $(v),$(latest)))
-	@$(MAKE) build-version v=$(version)
 	@docker push $(DOCKER_IMAGE):$(version)
 	@[ "$(version)" = "$(latest)" ] && docker push $(DOCKER_IMAGE):latest || true
 
 push-dev-version:
 	$(eval version := $(or $(v),$(latest)))
-	@$(MAKE) build-dev-version v=$(version)
 	@docker push $(DOCKER_IMAGE)-dev:$(version)
 	@[ "$(version)" = "$(latest)" ] && docker push $(DOCKER_IMAGE)-dev:latest || true
