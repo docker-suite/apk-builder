@@ -104,8 +104,8 @@ key: ## Generate new private and public keys
 		exit
 
 remove: ## Remove all generated images
-	@docker images | grep $(DOCKER_IMAGE)-dev | tr -s ' ' | cut -d ' ' -f 2 | xargs -I {} docker rmi $(DOCKER_IMAGE)-dev:{}
-	@docker images | grep $(DOCKER_IMAGE) | tr -s ' ' | cut -d ' ' -f 2 | xargs -I {} docker rmi $(DOCKER_IMAGE):{}
+	@docker images | grep $(DOCKER_IMAGE)-dev | tr -s ' ' | cut -d ' ' -f 2 | xargs -I {} docker rmi $(DOCKER_IMAGE)-dev:{} || true
+	@docker images | grep $(DOCKER_IMAGE) | tr -s ' ' | cut -d ' ' -f 2 | xargs -I {} docker rmi $(DOCKER_IMAGE):{} || true
 
 readme: ## Generate docker hub full description
 	@docker run -t --rm \
