@@ -44,8 +44,6 @@ RUN \
 	set -x \
     # Update repository indexes
     && apk-update \
-    # Upgrade currently installed packages to match repositories
-    && apk upgrade --no-cache --available \
     # Install latest versions of packages included in alpine-sdk
     && apk-install \
         # Alpine configuration management scripts
