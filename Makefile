@@ -7,7 +7,7 @@ DOCKER_IMAGE_REVISION=$(shell git rev-parse --short HEAD)
 DIR:=$(strip $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST)))))
 
 ## Define the latest version
-latest = 3.11
+latest = 3.12
 
 ##
 .DEFAULT_GOAL := help
@@ -24,6 +24,8 @@ clean: ## Clean the workspace
 
 build: ## Build all versions
 	@$(MAKE) clean
+	@$(MAKE) build-version v=3.12
+	@$(MAKE) build-dev-version v=3.12
 	@$(MAKE) build-version v=3.11
 	@$(MAKE) build-dev-version v=3.11
 	@$(MAKE) build-version v=3.10
@@ -36,6 +38,8 @@ build: ## Build all versions
 	@$(MAKE) build-dev-version v=3.7
 
 test: ## Test all versions
+	$(MAKE) test-version v=3.12
+	$(MAKE) test-dev-version v=3.12
 	$(MAKE) test-version v=3.11
 	$(MAKE) test-dev-version v=3.11
 	$(MAKE) test-version v=3.10
@@ -48,6 +52,8 @@ test: ## Test all versions
 	$(MAKE) test-dev-version v=3.7
 
 push: ## Push all versions
+	$(MAKE) push-version v=3.12
+	$(MAKE) push-dev-version v=3.12
 	$(MAKE) push-version v=3.11
 	$(MAKE) push-dev-version v=3.11
 	$(MAKE) push-version v=3.10
@@ -59,7 +65,7 @@ push: ## Push all versions
 	$(MAKE) push-version v=3.7
 	$(MAKE) push-dev-version v=3.7
 
-shell: ## Run shell ( usage : make shell v="3.11" )
+shell: ## Run shell ( usage : make shell v="3.12" )
 	$(eval version := $(or $(v),$(latest)))
 	@mkdir -p $(DIR)/config
 	@mkdir -p $(DIR)/packages

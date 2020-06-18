@@ -54,6 +54,8 @@ RUN \
         ccache \
         # common tools
         cmake coreutils \
+        # sudo (no more in abuild since 3.12)
+        sudo \
     # Setup apk caching
     && setup-apkcache /var/cache/apk \
 	# Clear apk's cache
