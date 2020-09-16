@@ -12,6 +12,7 @@ package:
 	@docker run -it --rm \
 		-e http_proxy=${http_proxy} \
 		-e https_proxy=${https_proxy} \
+		-e no_proxy=${no_proxy} \
 		-e RSA_KEY_NAME=hugo.rsa \
 		-v $(DIR)/config:/config \
 		-v $(DIR)/packages:/packages \
