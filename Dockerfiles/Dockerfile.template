@@ -30,9 +30,9 @@ ENV PACKAGER_PRIVKEY /config/$RSA_KEY_NAME.priv
 ENV PACKAGER_PUBKEY /config/$RSA_KEY_NAME.pub
 
 ## User who will build all packages
-ENV DST_USER=packager \
-    DST_GROUP=abuild \
-    DST_HOME=/home/packager \
+ENV NEW_USER=packager \
+    NEW_GROUP=abuild \
+    NEW_HOME=/home/packager \
     USER=packager
 
 

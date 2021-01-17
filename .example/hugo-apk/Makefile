@@ -10,14 +10,11 @@ package:
 	@mkdir -p $(DIR)/packages
 	@mkdir -p $(DIR)/public
 	@docker run -it --rm \
-		-e http_proxy=${http_proxy} \
-		-e https_proxy=${https_proxy} \
-		-e no_proxy=${no_proxy} \
 		-e RSA_KEY_NAME=hugo.rsa \
 		-v $(DIR)/config:/config \
 		-v $(DIR)/packages:/packages \
 		-v $(DIR)/public:/public \
-		dsuite/apk-builder:3.10 \
+		dsuite/apk-builder:3.13 \
 		bash -c "package"
 
 clean:

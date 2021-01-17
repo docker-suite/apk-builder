@@ -7,7 +7,7 @@ DOCKER_IMAGE_REVISION=$(shell git rev-parse --short HEAD)
 DIR:=$(strip $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST)))))
 
 ## Define the latest version
-latest = 3.12
+latest = 3.13
 
 ##
 .DEFAULT_GOAL := help
@@ -24,56 +24,59 @@ clean: ## Clean the workspace
 
 build: ## Build all versions
 	@$(MAKE) clean
-	@$(MAKE) build-version v=3.12
-	@$(MAKE) build-dev-version v=3.12
-	@$(MAKE) build-version v=3.11
-	@$(MAKE) build-dev-version v=3.11
-	@$(MAKE) build-version v=3.10
-	@$(MAKE) build-dev-version v=3.10
-	@$(MAKE) build-version v=3.9
-	@$(MAKE) build-dev-version v=3.9
-	@$(MAKE) build-version v=3.8
-	@$(MAKE) build-dev-version v=3.8
 	@$(MAKE) build-version v=3.7
 	@$(MAKE) build-dev-version v=3.7
+	@$(MAKE) build-version v=3.8
+	@$(MAKE) build-dev-version v=3.8
+	@$(MAKE) build-version v=3.9
+	@$(MAKE) build-dev-version v=3.9
+	@$(MAKE) build-version v=3.10
+	@$(MAKE) build-dev-version v=3.10
+	@$(MAKE) build-version v=3.11
+	@$(MAKE) build-dev-version v=3.11
+	@$(MAKE) build-version v=3.12
+	@$(MAKE) build-dev-version v=3.12
+	@$(MAKE) build-version v=3.13
+	@$(MAKE) build-dev-version v=3.13
 
 test: ## Test all versions
-	$(MAKE) test-version v=3.12
-	$(MAKE) test-dev-version v=3.12
-	$(MAKE) test-version v=3.11
-	$(MAKE) test-dev-version v=3.11
-	$(MAKE) test-version v=3.10
-	$(MAKE) test-dev-version v=3.10
-	$(MAKE) test-version v=3.9
-	$(MAKE) test-dev-version v=3.9
-	$(MAKE) test-version v=3.8
-	$(MAKE) test-dev-version v=3.8
 	$(MAKE) test-version v=3.7
 	$(MAKE) test-dev-version v=3.7
+	$(MAKE) test-version v=3.8
+	$(MAKE) test-dev-version v=3.8
+	$(MAKE) test-version v=3.9
+	$(MAKE) test-dev-version v=3.9
+	$(MAKE) test-version v=3.10
+	$(MAKE) test-dev-version v=3.10
+	$(MAKE) test-version v=3.11
+	$(MAKE) test-dev-version v=3.11
+	$(MAKE) test-version v=3.12
+	$(MAKE) test-dev-version v=3.12
+	$(MAKE) test-version v=3.13
+	$(MAKE) test-dev-version v=3.13
 
 push: ## Push all versions
-	$(MAKE) push-version v=3.12
-	$(MAKE) push-dev-version v=3.12
-	$(MAKE) push-version v=3.11
-	$(MAKE) push-dev-version v=3.11
-	$(MAKE) push-version v=3.10
-	$(MAKE) push-dev-version v=3.10
-	$(MAKE) push-version v=3.9
-	$(MAKE) push-dev-version v=3.9
-	$(MAKE) push-version v=3.8
-	$(MAKE) push-dev-version v=3.8
 	$(MAKE) push-version v=3.7
 	$(MAKE) push-dev-version v=3.7
+	$(MAKE) push-version v=3.8
+	$(MAKE) push-dev-version v=3.8
+	$(MAKE) push-version v=3.9
+	$(MAKE) push-dev-version v=3.9
+	$(MAKE) push-version v=3.10
+	$(MAKE) push-dev-version v=3.10
+	$(MAKE) push-version v=3.11
+	$(MAKE) push-dev-version v=3.11
+	$(MAKE) push-version v=3.12
+	$(MAKE) push-dev-version v=3.12
+	$(MAKE) push-version v=3.13
+	$(MAKE) push-dev-version v=3.13
 
-shell: ## Run shell ( usage : make shell v="3.12" )
+shell: ## Run shell ( usage : make shell v="3.13" )
 	$(eval version := $(or $(v),$(latest)))
 	@mkdir -p $(DIR)/config
 	@mkdir -p $(DIR)/packages
 	@mkdir -p $(DIR)/public
 	@docker run -it --rm \
-		-e http_proxy=${http_proxy} \
-		-e https_proxy=${https_proxy} \
-		-e no_proxy=${no_proxy} \
 		-e DEBUG_LEVEL=DEBUG \
 		-v $(DIR)/config:/config \
 		-v $(DIR)/packages:/packages \
@@ -81,15 +84,12 @@ shell: ## Run shell ( usage : make shell v="3.12" )
 		$(DOCKER_IMAGE)-dev:$(version) \
 		bash
 
-package: ## Build all packages
+package: ## Build all packages ( usage : make package v="3.13" )
 	$(eval version := $(or $(v),$(latest)))
 	@mkdir -p $(DIR)/config
 	@mkdir -p $(DIR)/packages
 	@mkdir -p $(DIR)/public
 	@docker run -it --rm \
-		-e http_proxy=${http_proxy} \
-		-e https_proxy=${https_proxy} \
-		-e no_proxy=${no_proxy} \
 		-e DEBUG_LEVEL=DEBUG \
 		-v $(DIR)/config:/config \
 		-v $(DIR)/packages:/packages \
@@ -103,9 +103,6 @@ key: ## Generate new private and public keys
 	@mkdir -p $(DIR)/packages
 	@mkdir -p $(DIR)/public
 	@docker run -it --rm \
-		-e http_proxy=${http_proxy} \
-		-e https_proxy=${https_proxy} \
-		-e no_proxy=${no_proxy} \
 		-e DEBUG_LEVEL=DEBUG \
 		-e RSA_KEY_NAME=my-key.rsa \
 		-v $(DIR)/config:/config \
@@ -118,9 +115,6 @@ remove: ## Remove all generated images
 
 readme: ## Generate docker hub full description
 	@docker run -t --rm \
-		-e http_proxy=${http_proxy} \
-		-e https_proxy=${https_proxy} \
-		-e no_proxy=${no_proxy} \
 		-e DEBUG_LEVEL=DEBUG \
 		-e DOCKER_USERNAME=${DOCKER_USERNAME} \
 		-e DOCKER_PASSWORD=${DOCKER_PASSWORD} \
@@ -131,9 +125,6 @@ readme: ## Generate docker hub full description
 build-version:
 	$(eval version := $(or $(v),$(latest)))
 	@docker run --rm \
-		-e http_proxy=${http_proxy} \
-		-e https_proxy=${https_proxy} \
-		-e no_proxy=${no_proxy} \
 		-e ALPINE_VERSION=$(version) \
 		-e DOCKER_IMAGE_CREATED=$(DOCKER_IMAGE_CREATED) \
 		-e DOCKER_IMAGE_REVISION=$(DOCKER_IMAGE_REVISION) \
@@ -152,9 +143,6 @@ build-version:
 build-dev-version:
 	$(eval version := $(or $(v),$(latest)))
 	@docker run --rm \
-		-e http_proxy=${http_proxy} \
-		-e https_proxy=${https_proxy} \
-		-e no_proxy=${no_proxy} \
 		-e ALPINE_VERSION=$(version) \
 		-v $(DIR)/Dockerfiles:/data \
 		dsuite/alpine-data \
@@ -171,9 +159,6 @@ build-dev-version:
 test-version:
 	$(eval version := $(or $(v),$(latest)))
 	@docker run --rm -t \
-		-e http_proxy=${http_proxy} \
-		-e https_proxy=${https_proxy} \
-		-e no_proxy=${no_proxy} \
 		-v $(DIR)/tests:/goss \
 		-v /tmp:/tmp \
 		-v /var/run/docker.sock:/var/run/docker.sock \
@@ -183,9 +168,6 @@ test-version:
 test-dev-version:
 	$(eval version := $(or $(v),$(latest)))
 	@docker run --rm -t \
-		-e http_proxy=${http_proxy} \
-		-e https_proxy=${https_proxy} \
-		-e no_proxy=${no_proxy} \
 		-v $(DIR)/tests:/goss \
 		-v /tmp:/tmp \
 		-v /var/run/docker.sock:/var/run/docker.sock \
