@@ -22,54 +22,54 @@ clean: ## Clean the workspace
 	@rm -rf $(DIR)/packages/*/src
 	@rm -rf $(DIR)/public
 
-build: ## Build all versions
+build-all: ## Build all versions
 	@$(MAKE) clean
-	@$(MAKE) build-version v=3.7
-	@$(MAKE) build-dev-version v=3.7
-	@$(MAKE) build-version v=3.8
-	@$(MAKE) build-dev-version v=3.8
-	@$(MAKE) build-version v=3.9
-	@$(MAKE) build-dev-version v=3.9
-	@$(MAKE) build-version v=3.10
-	@$(MAKE) build-dev-version v=3.10
-	@$(MAKE) build-version v=3.11
-	@$(MAKE) build-dev-version v=3.11
-	@$(MAKE) build-version v=3.12
-	@$(MAKE) build-dev-version v=3.12
-	@$(MAKE) build-version v=3.13
-	@$(MAKE) build-dev-version v=3.13
+	@$(MAKE) build v=3.7
+	@$(MAKE) build-dev v=3.7
+	@$(MAKE) build v=3.8
+	@$(MAKE) build-dev v=3.8
+	@$(MAKE) build v=3.9
+	@$(MAKE) build-dev v=3.9
+	@$(MAKE) build v=3.10
+	@$(MAKE) build-dev v=3.10
+	@$(MAKE) build v=3.11
+	@$(MAKE) build-dev v=3.11
+	@$(MAKE) build v=3.12
+	@$(MAKE) build-dev v=3.12
+	@$(MAKE) build v=3.13
+	@$(MAKE) build-dev v=3.13
 
-test: ## Test all versions
-	$(MAKE) test-version v=3.7
-	$(MAKE) test-dev-version v=3.7
-	$(MAKE) test-version v=3.8
-	$(MAKE) test-dev-version v=3.8
-	$(MAKE) test-version v=3.9
-	$(MAKE) test-dev-version v=3.9
-	$(MAKE) test-version v=3.10
-	$(MAKE) test-dev-version v=3.10
-	$(MAKE) test-version v=3.11
-	$(MAKE) test-dev-version v=3.11
-	$(MAKE) test-version v=3.12
-	$(MAKE) test-dev-version v=3.12
-	$(MAKE) test-version v=3.13
-	$(MAKE) test-dev-version v=3.13
+test-all: ## Test all versions
+	$(MAKE) test v=3.7
+	$(MAKE) test-dev v=3.7
+	$(MAKE) test v=3.8
+	$(MAKE) test-dev v=3.8
+	$(MAKE) test v=3.9
+	$(MAKE) test-dev v=3.9
+	$(MAKE) test v=3.10
+	$(MAKE) test-dev v=3.10
+	$(MAKE) test v=3.11
+	$(MAKE) test-dev v=3.11
+	$(MAKE) test v=3.12
+	$(MAKE) test-dev v=3.12
+	$(MAKE) test v=3.13
+	$(MAKE) test-dev v=3.13
 
-push: ## Push all versions
-	$(MAKE) push-version v=3.7
-	$(MAKE) push-dev-version v=3.7
-	$(MAKE) push-version v=3.8
-	$(MAKE) push-dev-version v=3.8
-	$(MAKE) push-version v=3.9
-	$(MAKE) push-dev-version v=3.9
-	$(MAKE) push-version v=3.10
-	$(MAKE) push-dev-version v=3.10
-	$(MAKE) push-version v=3.11
-	$(MAKE) push-dev-version v=3.11
-	$(MAKE) push-version v=3.12
-	$(MAKE) push-dev-version v=3.12
-	$(MAKE) push-version v=3.13
-	$(MAKE) push-dev-version v=3.13
+push-all: ## Push all versions
+	$(MAKE) push v=3.7
+	$(MAKE) push-dev v=3.7
+	$(MAKE) push v=3.8
+	$(MAKE) push-dev v=3.8
+	$(MAKE) push v=3.9
+	$(MAKE) push-dev v=3.9
+	$(MAKE) push v=3.10
+	$(MAKE) push-dev v=3.10
+	$(MAKE) push v=3.11
+	$(MAKE) push-dev v=3.11
+	$(MAKE) push v=3.12
+	$(MAKE) push-dev v=3.12
+	$(MAKE) push v=3.13
+	$(MAKE) push-dev v=3.13
 
 shell: ## Run shell ( usage : make shell v="3.13" )
 	$(eval version := $(or $(v),$(latest)))
@@ -122,7 +122,7 @@ readme: ## Generate docker hub full description
 		-v $(DIR):/data \
 		dsuite/hub-updater
 
-build-version:
+build:
 	$(eval version := $(or $(v),$(latest)))
 	@docker run --rm \
 		-e ALPINE_VERSION=$(version) \
@@ -132,15 +132,12 @@ build-version:
 		dsuite/alpine-data \
 		bash -c "templater Dockerfile.template > Dockerfile-$(version)"
 	@docker build \
-		--build-arg http_proxy=${http_proxy} \
-		--build-arg https_proxy=${https_proxy} \
-		--build-arg no_proxy=${no_proxy} \
 		--file $(DIR)/Dockerfiles/Dockerfile-$(version) \
 		--tag $(DOCKER_IMAGE):$(version) \
 		$(DIR)/Dockerfiles
 	@[ "$(version)" = "$(latest)" ] && docker tag $(DOCKER_IMAGE):$(version) $(DOCKER_IMAGE):latest || true
 
-build-dev-version:
+build-dev:
 	$(eval version := $(or $(v),$(latest)))
 	@docker run --rm \
 		-e ALPINE_VERSION=$(version) \
@@ -148,15 +145,12 @@ build-dev-version:
 		dsuite/alpine-data \
 		bash -c "templater Dockerfile.dev.template > Dockerfile.dev-$(version)"
 	@docker build \
-		--build-arg http_proxy=${http_proxy} \
-		--build-arg https_proxy=${https_proxy} \
-		--build-arg no_proxy=${no_proxy} \
 		--file $(DIR)/Dockerfiles/Dockerfile.dev-$(version) \
 		--tag $(DOCKER_IMAGE)-dev:$(version) \
 		$(DIR)/Dockerfiles
 	@[ "$(version)" = "$(latest)" ] && docker tag $(DOCKER_IMAGE)-dev:$(version) $(DOCKER_IMAGE)-dev:latest || true
 
-test-version:
+test:
 	$(eval version := $(or $(v),$(latest)))
 	@docker run --rm -t \
 		-v $(DIR)/tests:/goss \
@@ -165,7 +159,7 @@ test-version:
 		dsuite/goss:latest \
 		dgoss run --entrypoint=/goss/entrypoint.sh $(DOCKER_IMAGE):$(version)
 
-test-dev-version:
+test-dev:
 	$(eval version := $(or $(v),$(latest)))
 	@docker run --rm -t \
 		-v $(DIR)/tests:/goss \
@@ -174,12 +168,12 @@ test-dev-version:
 		dsuite/goss:latest \
 		dgoss run --entrypoint=/goss/entrypoint.sh $(DOCKER_IMAGE)-dev:$(version)
 
-push-version:
+push:
 	$(eval version := $(or $(v),$(latest)))
 	@docker push $(DOCKER_IMAGE):$(version)
 	@[ "$(version)" = "$(latest)" ] && docker push $(DOCKER_IMAGE):latest || true
 
-push-dev-version:
+push-dev:
 	$(eval version := $(or $(v),$(latest)))
 	@docker push $(DOCKER_IMAGE)-dev:$(version)
 	@[ "$(version)" = "$(latest)" ] && docker push $(DOCKER_IMAGE)-dev:latest || true
