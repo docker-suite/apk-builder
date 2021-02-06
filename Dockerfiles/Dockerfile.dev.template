@@ -14,9 +14,9 @@ RUN \
     && apk-update \
     # Install latest versions of packages included in alpine-sdk
     && apk-install \
-        autoconf apache2-dev aspell-dev bison bzip2-dev curl-dev cyrus-sasl-dev \
-        db-dev freetds-dev file freetype-dev gd-dev gdbm-dev \
-        gettext-dev gmp-dev icu-dev imap-dev krb5-dev libedit-dev libical-dev \
+        autoconf apache2-dev aspell-dev bash bison bzip2-dev curl-dev cyrus-sasl-dev \
+        db-dev dbus-glib-dev freetds-dev file freetype-dev gd-dev gdbm-dev gettext-dev  \
+        glib-devgmp-dev icu-dev imap-dev krb5-dev libedit-dev libical-dev \
         libjpeg-turbo-dev libmcrypt-dev libmemcached-dev libpng-dev libressl-dev \
         libsodium-dev libtool libwebp-dev libxml2-dev libxpm-dev libxslt-dev \
         libzip-dev net-snmp-dev openldap-dev pcre-dev pcre2-dev postgresql-dev \
