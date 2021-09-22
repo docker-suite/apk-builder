@@ -17,6 +17,9 @@ set -eu
 # List of all packages
 packages="$(find . -name '*' \( -type d -o -type l \) -mindepth 1 -maxdepth 1 -exec test -e '{}/APKBUILD' \; -print | sort -u)"
 
+# Variables
+declare force=0
+
 # Check for a list of packages to build
 while [[ $# -gt 0 ]]; do
     # help
@@ -31,6 +34,7 @@ while [[ $# -gt 0 ]]; do
         echo "OPTIONS:"
         echo "  -h, --help         Display this help."
         echo "  -p, --package     'package_name...'"
+        echo "  -f, --force       'Force package build'"
         exit 0;
     fi
 
@@ -40,6 +44,11 @@ while [[ $# -gt 0 ]]; do
         for package in ${2}; do
             packages="$packages $package"
         done
+    fi
+
+    # force
+    if [[ "$1" = "-f" ]] || [[ "$1" = "--force" ]]; then
+        force=1
     fi
 
     shift
@@ -98,7 +107,13 @@ packages=$(echo "$packages"  | awk -v RS="[ \n]+" '!n[$0]++')
 
 # Build packages
 for package in $packages; do
-    if [[ -d "$package" ]]; then
+
+    # Check if package exits
+    if [[ -n "$(apk search "$(basename "$package")" -e)" && force -eq 0 ]]; then
+        NOTICE "Package $(basename "$package") already exists. Skipping it."
+
+    # Build package
+    elif  [[ -d "$package" ]]; then
         NOTICE "Building package : $(basename "$package")"
 
         ## Move to the package to build
@@ -138,8 +153,8 @@ for package in $packages; do
 
         # Remove binary packages except current version
         abuild cleanoldpkg
-
-        # Regenerate index with trusted signature
-        generate-index
     fi
 done
+
+# Regenerate index with trusted signature
+generate-index

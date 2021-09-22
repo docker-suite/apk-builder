@@ -1,5 +1,5 @@
 # Hugo apk Builder
-FROM dsuite/apk-builder:3.13 as hugo_apk_builder
+FROM dsuite/apk-builder:3.14 as hugo_apk_builder
 
 ENV RSA_KEY_NAME hugo.rsa
 
@@ -12,10 +12,14 @@ RUN set -x \
     && cp -r /public /repo
 
 # Hugo image
-FROM dsuite/alpine-base:3.13
+FROM dsuite/alpine-base:3.14
 
+## Copy hugo package
 COPY --from=hugo_apk_builder /repo /tmp/repo
 COPY --from=hugo_apk_builder /etc/apk/keys /etc/apk/keys
+
+## Copy files
+COPY rootfs /
 
 RUN \
 	# Print executed commands
@@ -23,7 +27,7 @@ RUN \
     # Update repository indexes
     && apk-update \
     # Download the install script and run it
-    && apk add --repository /tmp/repo/v3.13 \
+    && apk add --repository /tmp/repo/v3.14 \
         hugo \
 	# Clear apk's cache
 	&& apk-cleanup

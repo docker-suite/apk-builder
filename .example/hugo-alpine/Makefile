@@ -8,7 +8,7 @@ DIR:=$(strip $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST)))))
 build:
 	@docker build --tag hugo .
 
-run:
+shell:
 	@docker run -it --rm hugo bash
 
 clean:

@@ -29,12 +29,18 @@ ENV RSA_KEY_NAME docker-suite.rsa
 ENV PACKAGER_PRIVKEY /config/$RSA_KEY_NAME.priv
 ENV PACKAGER_PUBKEY /config/$RSA_KEY_NAME.pub
 
-## User who will build all packages
-ENV NEW_USER=packager \
-    NEW_GROUP=abuild \
-    NEW_HOME=/home/packager \
-    USER=packager
+## Add packager user to existing abuild group.
+RUN adduser -G abuild -s /bin/sh -h /home/packager -S -D packager
 
+## Use packager user
+ENV USER=packager
+
+# Make packager user like sudo
+RUN \
+	# Print executed commands
+	set -x \
+    && echo "packager ALL=(ALL) ALL" >> /etc/sudoers \
+    && echo "packager ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 ## Install latest version of alpine-sdk
 ## and commmons tools taht can be used
@@ -63,7 +69,7 @@ RUN \
 
 
 ## Copy scripts
-COPY /rootfs /
+COPY rootfs /
 
 ## Define the default working folder
 WORKDIR /packages

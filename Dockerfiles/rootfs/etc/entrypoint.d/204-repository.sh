@@ -13,5 +13,5 @@ echo "/public/v$ALPINE_VERSION" >> /etc/apk/repositories
 # Sign index if exist
 #
 if [ -f "/public/v$ALPINE_VERSION/$ALPINE_ARCH/APKINDEX.tar.gz" ]; then
-    generate-index
+    su-exec "$USER" generate-index
 fi

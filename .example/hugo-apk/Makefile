@@ -14,7 +14,7 @@ package:
 		-v $(DIR)/config:/config \
 		-v $(DIR)/packages:/packages \
 		-v $(DIR)/public:/public \
-		dsuite/apk-builder:3.13 \
+		dsuite/apk-builder:3.14 \
 		bash -c "package"
 
 clean:

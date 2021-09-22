@@ -7,7 +7,7 @@ DOCKER_IMAGE_REVISION=$(shell git rev-parse --short HEAD)
 DIR:=$(strip $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST)))))
 
 ## Define the latest version
-latest = 3.13
+latest = 3.14
 
 ##
 .DEFAULT_GOAL := help
@@ -38,6 +38,8 @@ build-all: ## Build all versions
 	@$(MAKE) build-dev v=3.12
 	@$(MAKE) build v=3.13
 	@$(MAKE) build-dev v=3.13
+	@$(MAKE) build v=3.14
+	@$(MAKE) build-dev v=3.14
 
 test-all: ## Test all versions
 	$(MAKE) test v=3.7
@@ -54,6 +56,8 @@ test-all: ## Test all versions
 	$(MAKE) test-dev v=3.12
 	$(MAKE) test v=3.13
 	$(MAKE) test-dev v=3.13
+	$(MAKE) test v=3.14
+	$(MAKE) test-dev v=3.14
 
 push-all: ## Push all versions
 	$(MAKE) push v=3.7
@@ -70,8 +74,10 @@ push-all: ## Push all versions
 	$(MAKE) push-dev v=3.12
 	$(MAKE) push v=3.13
 	$(MAKE) push-dev v=3.13
+	$(MAKE) push v=3.14
+	$(MAKE) push-dev v=3.14
 
-shell: ## Run shell ( usage : make shell v="3.13" )
+shell: ## Run shell ( usage : make shell v=[3.7|3.8|3.9|3.10|3.11|3.12|3.13|3.14] )
 	$(eval version := $(or $(v),$(latest)))
 	@mkdir -p $(DIR)/config
 	@mkdir -p $(DIR)/packages
@@ -84,7 +90,21 @@ shell: ## Run shell ( usage : make shell v="3.13" )
 		$(DOCKER_IMAGE)-dev:$(version) \
 		bash
 
-package: ## Build all packages ( usage : make package v="3.13" )
+package: ## Build all packages ( usage : make package v=[3.7|3.8|3.9|3.10|3.11|3.12|3.13|3.14] p=[<package-name1> <package-name2>])
+	$(eval version := $(or $(v),$(latest)))
+	@test "$(p)"
+	@mkdir -p $(DIR)/config
+	@mkdir -p $(DIR)/packages
+	@mkdir -p $(DIR)/public
+	@docker run -it --rm \
+		-e DEBUG_LEVEL=DEBUG \
+		-v $(DIR)/config:/config \
+		-v $(DIR)/packages:/packages \
+		-v $(DIR)/public:/public \
+		$(DOCKER_IMAGE)-dev:$(version) \
+		bash -c "package -p \"$(p)\""
+
+packages: ## Build all packages ( usage : make packages v=[3.7|3.8|3.9|3.10|3.11|3.12|3.13|3.14] )
 	$(eval version := $(or $(v),$(latest)))
 	@mkdir -p $(DIR)/config
 	@mkdir -p $(DIR)/packages
@@ -141,6 +161,8 @@ build-dev:
 	$(eval version := $(or $(v),$(latest)))
 	@docker run --rm \
 		-e ALPINE_VERSION=$(version) \
+		-e DOCKER_IMAGE_CREATED=$(DOCKER_IMAGE_CREATED) \
+		-e DOCKER_IMAGE_REVISION=$(DOCKER_IMAGE_REVISION) \
 		-v $(DIR)/Dockerfiles:/data \
 		dsuite/alpine-data \
 		bash -c "templater Dockerfile.dev.template > Dockerfile.dev-$(version)"
@@ -152,21 +174,13 @@ build-dev:
 
 test:
 	$(eval version := $(or $(v),$(latest)))
-	@docker run --rm -t \
-		-v $(DIR)/tests:/goss \
-		-v /tmp:/tmp \
-		-v /var/run/docker.sock:/var/run/docker.sock \
-		dsuite/goss:latest \
-		dgoss run --entrypoint=/goss/entrypoint.sh $(DOCKER_IMAGE):$(version)
+	@GOSS_FILES_PATH=$(DIR)/tests \
+	 	dgoss run $(DOCKER_IMAGE):$(version) bash -c "sleep 60"
 
 test-dev:
 	$(eval version := $(or $(v),$(latest)))
-	@docker run --rm -t \
-		-v $(DIR)/tests:/goss \
-		-v /tmp:/tmp \
-		-v /var/run/docker.sock:/var/run/docker.sock \
-		dsuite/goss:latest \
-		dgoss run --entrypoint=/goss/entrypoint.sh $(DOCKER_IMAGE)-dev:$(version)
+	@GOSS_FILES_PATH=$(DIR)/tests \
+	 	dgoss run $(DOCKER_IMAGE)-dev:$(version) bash -c "sleep 60"
 
 push:
 	$(eval version := $(or $(v),$(latest)))
