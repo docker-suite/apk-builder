@@ -7,7 +7,7 @@ DOCKER_IMAGE_REVISION=$(shell git rev-parse --short HEAD)
 DIR:=$(strip $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST)))))
 
 ## Define the latest version
-latest = 3.14
+latest = 3.16
 
 ##
 .DEFAULT_GOAL := help
@@ -40,6 +40,10 @@ build-all: ## Build all versions
 	@$(MAKE) build-dev v=3.13
 	@$(MAKE) build v=3.14
 	@$(MAKE) build-dev v=3.14
+	@$(MAKE) build v=3.15
+	@$(MAKE) build-dev v=3.15
+	@$(MAKE) build v=3.16
+	@$(MAKE) build-dev v=3.16
 
 test-all: ## Test all versions
 	$(MAKE) test v=3.7
@@ -58,6 +62,10 @@ test-all: ## Test all versions
 	$(MAKE) test-dev v=3.13
 	$(MAKE) test v=3.14
 	$(MAKE) test-dev v=3.14
+	$(MAKE) test v=3.15
+	$(MAKE) test-dev v=3.15
+	$(MAKE) test v=3.16
+	$(MAKE) test-dev v=3.16
 
 push-all: ## Push all versions
 	$(MAKE) push v=3.7
@@ -76,8 +84,12 @@ push-all: ## Push all versions
 	$(MAKE) push-dev v=3.13
 	$(MAKE) push v=3.14
 	$(MAKE) push-dev v=3.14
+	$(MAKE) push v=3.15
+	$(MAKE) push-dev v=3.15
+	$(MAKE) push v=3.16
+	$(MAKE) push-dev v=3.16
 
-shell: ## Run shell ( usage : make shell v=[3.7|3.8|3.9|3.10|3.11|3.12|3.13|3.14] )
+shell: ## Run shell ( usage : make shell v=[3.7|3.8|3.9|3.10|3.11|3.12|3.13|3.14|3.15|3.16] )
 	$(eval version := $(or $(v),$(latest)))
 	@mkdir -p $(DIR)/config
 	@mkdir -p $(DIR)/packages
@@ -90,7 +102,7 @@ shell: ## Run shell ( usage : make shell v=[3.7|3.8|3.9|3.10|3.11|3.12|3.13|3.14
 		$(DOCKER_IMAGE)-dev:$(version) \
 		bash
 
-package: ## Build all packages ( usage : make package v=[3.7|3.8|3.9|3.10|3.11|3.12|3.13|3.14] p=[<package-name1> <package-name2>])
+package: ## Build all packages ( usage : make package v=[3.7|3.8|3.9|3.10|3.11|3.12|3.13|3.14|3.15|3.16] p=[<package-name1> <package-name2>])
 	$(eval version := $(or $(v),$(latest)))
 	@test "$(p)"
 	@mkdir -p $(DIR)/config
@@ -104,7 +116,7 @@ package: ## Build all packages ( usage : make package v=[3.7|3.8|3.9|3.10|3.11|3
 		$(DOCKER_IMAGE)-dev:$(version) \
 		bash -c "package -p \"$(p)\""
 
-packages: ## Build all packages ( usage : make packages v=[3.7|3.8|3.9|3.10|3.11|3.12|3.13|3.14] )
+packages: ## Build all packages ( usage : make packages v=[3.7|3.8|3.9|3.10|3.11|3.12|3.13|3.14|3.15|3.16] )
 	$(eval version := $(or $(v),$(latest)))
 	@mkdir -p $(DIR)/config
 	@mkdir -p $(DIR)/packages
