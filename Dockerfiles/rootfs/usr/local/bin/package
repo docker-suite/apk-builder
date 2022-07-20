@@ -109,7 +109,7 @@ packages=$(echo "$packages"  | awk -v RS="[ \n]+" '!n[$0]++')
 for package in $packages; do
 
     # Check if package exits
-    if [[ -n "$(apk search "$(basename "$package")" -e)" && force -eq 0 ]]; then
+    if [[ -n "$(apk search "$(basename "$package")" -e)" && $force -eq 0 ]]; then
         NOTICE "Package $(basename "$package") already exists. Skipping it."
 
     # Build package
@@ -129,32 +129,41 @@ for package in $packages; do
         fi
 
         # Update repository indexes
+        DEBUG "apk update : $(basename "$package")"
         sudo -E apk update
 
         # Clean pkgdir and srcdir
+        DEBUG "abuild clean : $(basename "$package")"
         abuild clean
 
         # Generate checksum to be included in APKBUILD
+        DEBUG "abuild checksum : $(basename "$package")"
         abuild checksum
 
         # Install packages listed in makedepends and depends
+        DEBUG "abuild deps : $(basename "$package")"
         abuild deps
 
         # Remove existing index has it will be generated later
+        DEBUG "remove-index : $(basename "$package")"
         remove-index
 
         # Build from APKBUILD
         # -r Install missing dependencies from system repository (using sudo)
         # -K Keep buildtime temp dirs and files (srcdir/pkgdir/deps)
+        DEBUG "abuild -v -r -K -P "/home/$USER" : $(basename "$package")"
         abuild -r -K -P "/home/$USER"
 
         # Generate index with trusted signature
+        DEBUG "generate-index : $(basename "$package")"
         generate-index
 
         # Remove binary packages except current version
+        DEBUG "abuild cleanoldpkg : $(basename "$package")"
         abuild cleanoldpkg
     fi
 done
 
 # Regenerate index with trusted signature
+DEBUG "generate-index"
 generate-index
